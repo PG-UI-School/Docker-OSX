@@ -22,7 +22,7 @@ jobs:
             -setvncpw
 
       - name: Install noVNC + websockify (CORRECT METHOD)
-          run: |
+        run: |
     brew install pipx
     pipx ensurepath
     pipx install websockify
