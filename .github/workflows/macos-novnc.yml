@@ -23,13 +23,14 @@ jobs:
 
       - name: Install noVNC + websockify (CORRECT METHOD)
         run: |
-    brew install pipx
-    pipx ensurepath
-    pipx install websockify
-    git clone https://github.com/novnc/noVNC.git ~/novnc
+          brew install pipx
+          pipx ensurepath
+          pipx install websockify
+          git clone https://github.com/novnc/noVNC.git ~/novnc
+
       - name: Start noVNC
         run: |
-          nohup websockify --web ~/novnc 6080 localhost:5900 > novnc.log 2>&1 &
+          nohup ~/.local/bin/websockify --web ~/novnc 6080 localhost:5900 > novnc.log 2>&1 &
 
       - name: Install Cloudflare Tunnel (No Signup)
         run: |
