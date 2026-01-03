@@ -21,21 +21,26 @@ jobs:
             -configure -clientopts -setvnclegacy -vnclegacy yes \
             -setvncpw
 
-      - name: Install noVNC
+      - name: Install websockify
         run: |
-          brew install novnc websockify
+          brew update
+          brew install websockify
+
+      - name: Install noVNC (manual, because Brew is unreliable)
+        run: |
+          git clone https://github.com/novnc/noVNC.git ~/novnc
 
       - name: Start noVNC Server
         run: |
-          websockify --web=/usr/local/share/novnc/ 6080 localhost:5900 &
+          websockify --web ~/novnc 6080 localhost:5900 &
 
       - name: Show Access Info
         run: |
           echo "===================================="
           echo "OPEN THIS IN EDGE:"
           echo "https://github.com/${{ github.repository }}/actions"
-          echo "Then open the job logs"
-          echo "noVNC runs on port 6080"
+          echo "Open the running job → Logs"
+          echo "noVNC is running on port 6080"
           echo "VNC password: password"
           echo "===================================="
 
