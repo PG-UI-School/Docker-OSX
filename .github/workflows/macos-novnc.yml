@@ -1,4 +1,4 @@
-name: macOS Safari via noVNC
+name: macOS Safari (Browser Only)
 
 on:
   workflow_dispatch:
@@ -21,28 +21,16 @@ jobs:
             -configure -clientopts -setvnclegacy -vnclegacy yes \
             -setvncpw
 
-      - name: Install websockify
+      - name: Install noVNC + websockify
         run: |
-          brew update
           brew install websockify
-
-      - name: Install noVNC (manual, because Brew is unreliable)
-        run: |
           git clone https://github.com/novnc/noVNC.git ~/novnc
 
-      - name: Start noVNC Server
+      - name: Start noVNC
         run: |
           websockify --web ~/novnc 6080 localhost:5900 &
 
-      - name: Show Access Info
+      - name: Expose via Cloudflare (NO SIGNUP)
         run: |
-          echo "===================================="
-          echo "OPEN THIS IN EDGE:"
-          echo "https://github.com/${{ github.repository }}/actions"
-          echo "Open the running job → Logs"
-          echo "noVNC is running on port 6080"
-          echo "VNC password: password"
-          echo "===================================="
-
-      - name: Keep Alive
-        run: sleep 6h
+          brew install cloudflared
+          cloudflared tunnel --url http://localhost:6080
