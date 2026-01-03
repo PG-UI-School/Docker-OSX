@@ -21,16 +21,19 @@ jobs:
             -configure -clientopts -setvnclegacy -vnclegacy yes \
             -setvncpw
 
-      - name: Install noVNC + websockify
+      - name: Install noVNC + websockify (CORRECT METHOD)
         run: |
-          brew install websockify
+          pip3 install websockify
           git clone https://github.com/novnc/noVNC.git ~/novnc
 
       - name: Start noVNC
         run: |
-          websockify --web ~/novnc 6080 localhost:5900 &
+          nohup websockify --web ~/novnc 6080 localhost:5900 > novnc.log 2>&1 &
 
-      - name: Expose via Cloudflare (NO SIGNUP)
+      - name: Install Cloudflare Tunnel (No Signup)
         run: |
           brew install cloudflared
+
+      - name: Expose via Cloudflare Quick Tunnel
+        run: |
           cloudflared tunnel --url http://localhost:6080
