@@ -1,0 +1,43 @@
+name: macOS Safari via noVNC
+
+on:
+  workflow_dispatch:
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Enable Screen Sharing
+        run: |
+          sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
+            -activate -configure -access -on \
+            -restart -agent -privs -all
+
+      - name: Set VNC Password
+        run: |
+          printf "password\npassword\n" | sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
+            -configure -clientopts -setvnclegacy -vnclegacy yes \
+            -setvncpw
+
+      - name: Install noVNC
+        run: |
+          brew install novnc websockify
+
+      - name: Start noVNC Server
+        run: |
+          websockify --web=/usr/local/share/novnc/ 6080 localhost:5900 &
+
+      - name: Show Access Info
+        run: |
+          echo "===================================="
+          echo "OPEN THIS IN EDGE:"
+          echo "https://github.com/${{ github.repository }}/actions"
+          echo "Then open the job logs"
+          echo "noVNC runs on port 6080"
+          echo "VNC password: password"
+          echo "===================================="
+
+      - name: Keep Alive
+        run: sleep 6h
