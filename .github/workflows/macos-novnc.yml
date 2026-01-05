@@ -9,19 +9,28 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Enable Screen Sharing
+      - name: Create admin user for VNC
+        run: |
+          sudo sysadminctl -addUser admin \
+            -password 12345678 \
+            -admin
+
+      - name: Enable Screen Sharing (VNC)
         run: |
           sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
             -activate -configure -access -on \
-            -restart -agent -privs -all
+            -users admin \
+            -restart -agent \
+            -privs -all
 
-      - name: Set VNC Password
+      - name: Set VNC Legacy Password
         run: |
-          printf "password\npassword\n" | sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
-            -configure -clientopts -setvnclegacy -vnclegacy yes \
+          printf "12345678\n12345678\n" | sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
+            -configure -clientopts \
+            -setvnclegacy -vnclegacy yes \
             -setvncpw
 
-      - name: Install noVNC + websockify (CORRECT METHOD)
+      - name: Install noVNC + websockify
         run: |
           brew install pipx
           pipx ensurepath
@@ -30,9 +39,12 @@ jobs:
 
       - name: Start noVNC
         run: |
-          nohup ~/.local/bin/websockify --web ~/novnc 6080 localhost:5900 > novnc.log 2>&1 &
+          nohup ~/.local/bin/websockify \
+            --web ~/novnc \
+            6080 localhost:5900 \
+            > novnc.log 2>&1 &
 
-      - name: Install Cloudflare Tunnel (No Signup)
+      - name: Install Cloudflare Tunnel
         run: |
           brew install cloudflared
 
